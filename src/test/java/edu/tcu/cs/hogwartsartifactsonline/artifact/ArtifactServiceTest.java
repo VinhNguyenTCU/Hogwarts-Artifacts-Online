@@ -10,6 +10,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,8 +30,24 @@ class ArtifactServiceTest {
     @InjectMocks
     ArtifactService artifactService;
 
+    List<Artifact> artifacts;
+
     @BeforeEach
     void setUp() {
+        this.artifacts = new ArrayList<>();
+        Artifact artifact1 = new Artifact();
+        artifact1.setId("1250808601744904191");
+        artifact1.setName("Deluminator");
+        artifact1.setDescription("A Deluminator is a device invented by Albus Dumbledore that resembles a cigarette lighter. It is used to remove or absord (as well as return) the light from any light source to provide cover to the user.");
+        artifact1.setImageUrl("ImageUrl");
+        this.artifacts.add(artifact1);
+
+        Artifact artifact2 = new Artifact();
+        artifact2.setId("1250808601744904192");
+        artifact2.setName("Invisibility Cloak");
+        artifact2.setDescription("An invisibility cloak is used to make the wearer invisible.");
+        artifact2.setImageUrl("ImageUrl");
+        this.artifacts.add(artifact2);
     }
 
     @AfterEach
@@ -89,4 +107,18 @@ class ArtifactServiceTest {
 
         verify(artifactRepository, times(1)).findById("1250808601744904192");
     }
+
+    @Test
+    void testFindAllSuccess() {
+        // Given
+        given(artifactRepository.findAll()).willReturn(this.artifacts);
+
+        // When
+        List<Artifact> actualArtifacts = artifactService.findAll();
+
+        // Then
+        assertThat(actualArtifacts.size()).isEqualTo(this.artifacts.size());
+        verify(artifactRepository, times(1)).findAll();
+    }
+
 }
