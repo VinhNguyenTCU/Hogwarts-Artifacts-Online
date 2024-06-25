@@ -21,6 +21,8 @@ import static org.mockito.BDDMockito.given;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -212,5 +214,33 @@ class ArtifactControllerTest {
                 .andExpect(jsonPath("$.code").value(StatusCode.NOT_FOUND))
                 .andExpect(jsonPath("$.message").value("Could not find artifact with Id: 1250808601744904192"))
                 .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @Test
+    void testDeleteArtifactSuccess() throws Exception {
+        // Given
+        doNothing().when(this.artifactService).delete("1250808601744904191");
+
+        // When and Then
+        this.mockMvc.perform(delete("/api/v1/artifacts/1250808601744904191").accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.flag").value(true))
+                .andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
+                .andExpect(jsonPath("$.message").value("Delete Artifact Success"))
+                .andExpect(jsonPath("$.data").isEmpty());
+
+    }
+
+    @Test
+    void testDeleteArtifactErrorWithNonExistentId() throws Exception{
+        // Given
+        doThrow(new ArtifactNotFoundException("1250808601744904191")).when(this.artifactService).delete("1250808601744904191");
+
+        // When and Then
+        this.mockMvc.perform(delete("/api/v1/artifacts/1250808601744904191").accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.flag").value(false))
+                .andExpect(jsonPath("$.code").value(StatusCode.NOT_FOUND))
+                .andExpect(jsonPath("$.message").value("Could not find artifact with Id: 1250808601744904191"))
+                .andExpect(jsonPath("$.data").isEmpty());
+
     }
 }
