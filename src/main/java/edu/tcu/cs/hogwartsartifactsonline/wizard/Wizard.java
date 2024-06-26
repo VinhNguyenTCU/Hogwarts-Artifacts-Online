@@ -22,6 +22,8 @@ public class Wizard implements Serializable {
 
     private String name;
 
+    private Integer numberOfArtifacts;
+
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "owner")
     private List<Artifact> artifacts = new ArrayList<>();
 
