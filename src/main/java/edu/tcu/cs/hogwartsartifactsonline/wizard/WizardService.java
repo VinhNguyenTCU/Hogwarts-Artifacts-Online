@@ -24,4 +24,16 @@ public class WizardService {
         return this.wizardRepository.findAll();
     }
 
+    public Wizard save(Wizard wizard){
+        return this.wizardRepository.save(wizard);
+    }
+
+    public Wizard update(Integer wizardId, Wizard update){
+        return this.wizardRepository.findById(wizardId)
+                .map(oldWizard -> {
+                    oldWizard.setName(update.getName());
+                    return this.wizardRepository.save(oldWizard);
+                })
+                .orElseThrow(() -> new WizardNotFoundException(wizardId));
+    }
 }
