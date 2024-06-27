@@ -1,1 +1,15 @@
-spring: { datasource: { url: jdbc:h2:mem:03b7d645-907a-4b48-924a-091660d65019, username: sa, password:  , driver-class-name: org.h2.Driver }, jpa: { show-sql: true } }
+spring: {
+  datasource:
+    { url: jdbc:h2:mem:03b7d645-907a-4b48-924a-091660d65019,
+      username: sa,
+      password:  ,
+      driver-class-name: org.h2.Driver
+    },
+  jpa: {
+    show-sql: true
+  }
+}
+
+api:
+  endpoint:
+    base-url: /api/v1

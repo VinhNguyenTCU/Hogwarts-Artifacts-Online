@@ -1,5 +1,6 @@
 package edu.tcu.cs.hogwartsartifactsonline.wizard;
 
+import edu.tcu.cs.hogwartsartifactsonline.system.exception.ObjectNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,9 +16,9 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class WizardServiceTest {
@@ -103,8 +104,8 @@ public class WizardServiceTest {
 
         // Then
         assertThat(thrown)
-                .isInstanceOf(WizardNotFoundException.class)
-                .hasMessage("Could not find wizard with Id: 1" );
+                .isInstanceOf(ObjectNotFoundException.class)
+                .hasMessage("Could not find a wizard with Id: 1" );
 
         // Verify
         verify(this.wizardRepository, times(1)).findById(1);
@@ -152,5 +153,53 @@ public class WizardServiceTest {
         verify(this.wizardRepository, times(1)).findById(1);
         verify(this.wizardRepository, times(1)).save(oldWizard);
 
+    }
+
+    @Test
+    void testUpdateNotFound() {
+        // Given
+        Wizard update = new Wizard();
+        update.setName("Albus Dumbledore - UPDATED");
+
+        given(this.wizardRepository.findById(1)).willReturn(Optional.empty());
+
+        // When
+        assertThrows(ObjectNotFoundException.class, () -> {
+            this.wizardService.update(1, update);
+        });
+
+        // Then
+        verify(this.wizardRepository, times(1)).findById(1);
+    }
+
+    @Test
+    void testDeleteSuccess(){
+        // Given
+        Wizard wizard1 = new Wizard();
+        wizard1.setId(1);
+        wizard1.setName("Albus Dumbledore");
+
+        given(this.wizardRepository.findById(1)).willReturn(Optional.of(wizard1));
+        doNothing().when(this.wizardRepository).deleteById(wizard1.getId());
+
+        // When
+        this.wizardService.delete(1);
+
+        // Then
+        verify(this.wizardRepository, times(1)).deleteById(wizard1.getId());
+    }
+
+    @Test
+    void testDeleteNotFound() {
+        // Given
+        given(this.wizardRepository.findById(1)).willReturn(Optional.empty());
+
+        // When
+        assertThrows(ObjectNotFoundException.class, () -> {
+            this.wizardService.delete(1);
+        });
+
+        // Then
+        verify(this.wizardRepository, times(1)).findById(1);
     }
 }

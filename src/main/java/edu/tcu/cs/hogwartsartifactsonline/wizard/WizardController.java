@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/v1/wizards")
+@RequestMapping("${api.endpoint.base-url}/wizards")
 public class WizardController {
 
     private final WizardService wizardService;
@@ -60,5 +60,11 @@ public class WizardController {
         Wizard updatedWizard = this.wizardService.update(wizardId, update);
         WizardDto updatedWizardDto = this.wizardToWizardDtoConverter.convert(updatedWizard);
         return new Result(true, StatusCode.SUCCESS, "Update Wizard Success", updatedWizardDto);
+    }
+
+    @DeleteMapping("/{wizardId}")
+    public Result deleteWizard(@PathVariable Integer wizardId){
+        this.wizardService.delete(wizardId);
+        return new Result(true, StatusCode.SUCCESS, "Delete Wizard Success");
     }
 }
