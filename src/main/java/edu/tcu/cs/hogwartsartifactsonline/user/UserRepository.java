@@ -1,9 +1,8 @@
-package edu.tcu.cs.hogwartsartifactsonline.wizard;
+package edu.tcu.cs.hogwartsartifactsonline.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface WizardRepository extends JpaRepository<Wizard, Integer> {
-
+public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 }
