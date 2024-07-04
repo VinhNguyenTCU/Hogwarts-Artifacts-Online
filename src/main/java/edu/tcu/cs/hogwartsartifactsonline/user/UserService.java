@@ -2,18 +2,25 @@ package edu.tcu.cs.hogwartsartifactsonline.user;
 
 import edu.tcu.cs.hogwartsartifactsonline.system.exception.ObjectNotFoundException;
 import jakarta.transaction.Transactional;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @Transactional
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
+    private final PasswordEncoder passwordEncoder;
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<UserEntity> findAll() {
@@ -26,7 +33,8 @@ public class UserService {
     }
 
     public UserEntity save(UserEntity user) {
-        // We need to encode plain text password before saving to the DB! TODO
+        // We need to encode plain text password before saving to the DB!
+        user.setPassword(this.passwordEncoder.encode(user.getPassword()));
         return this.userRepository.save(user);
     }
 
@@ -45,5 +53,12 @@ public class UserService {
         this.userRepository.findById(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("user", userId));
         this.userRepository.deleteById(userId);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return this.userRepository.findByUsername(username)// First, we need to find this user from database
+                .map(userEntity -> new MyUserPrincipal(userEntity)) // If found, wrap the returned user instance in a MyUserPrincipal
+                .orElseThrow(() -> new UsernameNotFoundException("Username " + username + " is not found.")); // Otherwise, throw an exception
     }
 }
