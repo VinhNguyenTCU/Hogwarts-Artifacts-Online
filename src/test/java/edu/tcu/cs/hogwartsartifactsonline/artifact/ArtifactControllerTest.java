@@ -28,7 +28,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false) // Turn off all the filters is also means turning of the spring security
 @SpringBootTest
 class ArtifactControllerTest {
 
